@@ -67,7 +67,7 @@ V_1(i+1)(index*(bits_number+2)-1 downto index*(bits_number+1)) <= X_d(bandwidth-
 V_1(i+1)(index*(bits_number+1)-1 downto 0) <= (others => '0');
 
 V_2(i+1)(index-1 downto 0) <= (others => '0');
-V_2(i+1)(index*(bits_number+6) downto index) <= W(i+1)(index*(bits_number+5) downto 0);
+V_2(i+1)(index*(bits_number+6) downto index) <= W(i)(index*(bits_number+5) downto 0);
 
 V(i+1) <= V_1(i+1)+V_2(i+1);
 W(i+1) <= V(i+1);
@@ -81,7 +81,7 @@ V_1(i+1)(index*(bits_number+2)-1 downto index*(bits_number+1)) <= X_d(bandwidth-
 V_1(i+1)(index*(bits_number+1)-1 downto 0) <= (others => '0');
 
 V_2(i+1)(index-1 downto 0) <= (others => '0');
-V_2(i+1)(index*(bits_number+6) downto index) <= W(i+1)(index*(bits_number+5) downto 0);
+V_2(i+1)(index*(bits_number+6) downto index) <= W(i)(index*(bits_number+5) downto 0);
 
 
 V_3(i-2)(index*(bits_number+2) downto 0) <= std_logic_vector(signed (Q_in(0))*signed(D_d(bandwidth-digits_number*(i+1)-1 downto bandwidth-digits_number*(i+2))));
@@ -102,7 +102,7 @@ end generate recurrenciveVW;
 
 lastVW: for i in bits_number-1 to bits_number+2 generate
 V_2(i+1)(index-1 downto 0) <= (others => '0');
-V_2(i+1)(index*(bits_number+6) downto index) <= W(i+1)(index*(bits_number+5) downto 0);
+V_2(i+1)(index*(bits_number+6) downto index) <= W(i)(index*(bits_number+5) downto 0);
 
 V(i+1) <=V_1(i+1)+V_2(i+1)-V_3(i-2);
 Q_tmp(bandwidth-(i-3)*digits_number-1 downto bandwidth-(i-2)*digits_number) <= V(i+1)(index*(bits_number+6) downto index*(bits_number+5)) + V(i+1)(index*(bits_number+5)-1);
