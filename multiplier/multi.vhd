@@ -8,15 +8,15 @@ use ieee.std_logic_unsigned.all;
 
 ENTITY multi IS
 
-generic ( radix : integer := 4;
-			 index : integer := 2;
-			 bandwidth : integer:= 12;
-			 digits_number :integer := 3; --how many bits are used to represent a number
+generic ( radix : integer := 2;
+			 index : integer := 1;
+			 bandwidth : integer:= 8;
+			 digits_number :integer := 2; --how many bits are used to represent a number
 			 bits_number: integer :=4---how many number the inputs have
 			 );
 			
-PORT ( X_m : in std_logic_vector (bandwidth-1 downto 0);
-		 Y_m : in std_logic_vector (bandwidth-1 downto 0);
+PORT ( X_m : in std_logic_vector (bandwidth-1 downto 0) := "01000000";
+		 Y_m : in std_logic_vector (bandwidth-1 downto 0) := "00011100";
 		 P_m : out std_logic_vector (bandwidth-1 downto 0));
 		 
 end multi;
@@ -25,7 +25,7 @@ Architecture gate of Multi is
 
 type XY  is array (bits_number downto 0) of std_logic_vector (index*(bits_number+1)-1 downto 0);
 type adj is array (bits_number-1 downto 0) of std_logic_vector (index*(bits_number+1)-1 downto 0);
-type VW  is array (bits_number+2 downto 0) of std_logic_vector (indeX*(bits_number+5) downto 0) ;
+type VW  is array (bits_number+2 downto 0) of std_logic_vector (indeX*(bits_number+4) downto 0) ;
 signal X_in: XY;
 signal Y_in: XY;
 signal X_adj:adj;
@@ -62,48 +62,51 @@ end generate;
 
 
 
-V(0)(index*(bits_number+5) downto index*(bits_number+2)+1) <= (others =>'0');
+V(0)(index*(bits_number+4) downto index*(bits_number+2)+1) <= (others =>'0');
 V(0)(index*(bits_number+2) downto 0) <= std_logic_vector(signed (y_in(1))*signed(X_m(bandwidth-1 downto bandwidth-digits_number)));
 W(0) <= V(0);
 
 --VW initial 
 
 initialVW :for i in 0 to 1 generate
-V_1(i+1)(index*(bits_number+5) downto index*(bits_number+2)+1) <= (others =>'0');
 V_1(i+1)(index*(bits_number+2) downto 0) <=  std_logic_vector(signed (y_in(i+2))*signed(X_m(bandwidth-digits_number*(i+1)-1 downto bandwidth-digits_number*(i+2))))
 														  +std_logic_vector(signed (x_in(i+1))*signed(Y_m(bandwidth-digits_number*(i+1)-1 downto bandwidth-digits_number*(i+2))));
-V_2(i+1)(index-1 downto 0) <= (others => '0');
-V_2(i+1)(index*(bits_number+5) downto index) <= W(i)(index*(bits_number+4) downto 0);
+V_1(i+1)(index*(bits_number+4) downto index*(bits_number+2)+1) <= (others =>V_1(i+1)(index*(bits_number+2)));
+
+V_2(i+1)(index*(bits_number+4) downto index) <= W(i)(index*(bits_number+3) downto 0);
+V_2(i+1)(index-1 downto 0) <= (others => V_2(i+1)(index*(bits_number+4)));
+
 V(i+1) <= V_1(i+1)+V_2(i+1);
 W(i+1) <= V(i+1);
 end generate initialVW;
 
 recurrenciveVW :for i in 2 to bits_number-2 generate
-V_1(i+1)(index*(bits_number+5) downto index*(bits_number+2)+1) <= (others =>'0');
 V_1(i+1)(index*(bits_number+2) downto 0) <=  std_logic_vector(signed (y_in(i+2))*signed(X_m(bandwidth-digits_number*(i+1)-1 downto bandwidth-digits_number*(i+2))))
 														  +std_logic_vector(signed (x_in(i+1))*signed(Y_m(bandwidth-digits_number*(i+1)-1 downto bandwidth-digits_number*(i+2))));
-V_2(i+1)(index-1 downto 0) <= (others => '0');
-V_2(i+1)(index*(bits_number+5) downto index) <= W(i)(index*(bits_number+4) downto 0);
+V_1(i+1)(index*(bits_number+4) downto index*(bits_number+2)+1) <= (others =>V_1(i+1)(index*(bits_number+2)));
+
+V_2(i+1)(index*(bits_number+4) downto index) <= W(i)(index*(bits_number+3) downto 0);
+V_2(i+1)(index-1 downto 0) <= (others => V_2(i+1)(index*(bits_number+4)));
 
 V(i+1) <=V_1(i+1)+V_2(i+1);
 
-p_m(bandwidth-(i-2)*digits_number-1 downto bandwidth-(i-1)*digits_number) <= V(i+1)(index*(bits_number+5) downto index*(bits_number+4)) + V(i+1)(index*(bits_number+4)-1);
+p_m(bandwidth-(i-2)*digits_number-1 downto bandwidth-(i-1)*digits_number) <= V(i+1)(index*(bits_number+4) downto index*(bits_number+3)) + V(i+1)(index*(bits_number+3)-1);
 
-W(i+1)(index*(bits_number+4)-1 downto 0) <= V(i+1)(index*(bits_number+4)-1 downto 0);
-W(i+1)(index*(bits_number+5) downto index*(bits_number+4)) <= (others => V(i+1)(index*(bits_number+4)-1));
+W(i+1)(index*(bits_number+3)-1 downto 0) <= V(i+1)(index*(bits_number+3)-1 downto 0);
+W(i+1)(index*(bits_number+4) downto index*(bits_number+3)) <= (others => V(i+1)(index*(bits_number+3)-1));
 end generate recurrenciveVW;
 
 
 lastVW: for i in bits_number-1 to bits_number+1 generate
-V(i+1)(index-1 downto 0) <= (others => '0');
-V(i+1)(index*(bits_number+5) downto index) <= W(i)(index*(bits_number+4) downto 0);
+V(i+1)(index*(bits_number+4) downto index) <= W(i)(index*(bits_number+3) downto 0);
+V(i+1)(index-1 downto 0) <= (others => V(i+1)(index*(bits_number+4)));
 
-p_m(bandwidth-(i-2)*digits_number-1 downto bandwidth-(i-1)*digits_number) <= V(i+1)(index*(bits_number+5) downto index*(bits_number+4)) + V(i+1)(index*(bits_number+4)-1);
+p_m(bandwidth-(i-2)*digits_number-1 downto bandwidth-(i-1)*digits_number) <= V(i+1)(index*(bits_number+4) downto index*(bits_number+3)) + V(i+1)(index*(bits_number+3)-1);
 
 
 
-W(i+1)(index*(bits_number+4)-1 downto 0) <= V(i+1)(index*(bits_number+4)-1 downto 0);
-W(i+1)(index*(bits_number+5) downto index*(bits_number+4)) <= (others => V(i+1)(index*(bits_number+4)-1));
+W(i+1)(index*(bits_number+3)-1 downto 0) <= V(i+1)(index*(bits_number+3)-1 downto 0);
+W(i+1)(index*(bits_number+4) downto index*(bits_number+3)) <= (others =>  V(i+1)((index*(bits_number+3)-1)));
 
 end generate lastVW;
 
