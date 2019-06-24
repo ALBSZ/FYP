@@ -14,8 +14,8 @@ generic ( radix : integer := 2;
 			 bits_number: integer :=4---how many number the inputs have
 			 );
 			
-PORT ( X_d : in std_logic_vector (bandwidth-1 downto 0):= "00010100";
-		 D_d : in std_logic_vector (bandwidth-1 downto 0):= "01000000";
+PORT ( X_d : in std_logic_vector (bandwidth-1 downto 0):= "00011100";
+		 D_d : in std_logic_vector (bandwidth-1 downto 0):= "00010000";
 		 Q_d : out std_logic_vector (bandwidth-1 downto 0));
 		 
 end divider;
@@ -65,7 +65,7 @@ W(0) <= V(0);
 --VW initial 
 
 initialVW :for i in 0 to 2 generate
-V_1(i+1)(index*(bits_number+5) downto index*(bits_number+1)) <= (others =>X_d(bandwidth-i*digits_number-1));
+V_1(i+1)(index*(bits_number+5) downto index*(bits_number+1)) <= (others =>X_d(bandwidth-1-(i+1)*digits_number));
 V_1(i+1)(index*(bits_number+1)-1 downto index*bits_number) <= X_d(bandwidth-digits_number*(i+1)-2 downto bandwidth-digits_number*(i+2));
 V_1(i+1)(index*bits_number-1 downto 0) <= (others => '0');
 
@@ -79,7 +79,7 @@ end generate initialVW;
 Q_in(0) <= (others => '0');
 
 recurrenciveVW :for i in 3 to bits_number-2 generate
-V_1(i+1)(index*(bits_number+5) downto index*(bits_number+1)) <= (others =>X_d(bandwidth-i*digits_number-1));
+V_1(i+1)(index*(bits_number+5) downto index*(bits_number+1)) <= (others =>X_d(bandwidth-(i+1)*digits_number-1));
 V_1(i+1)(index*(bits_number+1)-1 downto index*bits_number) <= X_d(bandwidth-digits_number*(i+1)-2 downto bandwidth-digits_number*(i+2));
 V_1(i+1)(index*bits_number-1 downto 0) <= (others => '0');
 
