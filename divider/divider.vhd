@@ -14,8 +14,8 @@ generic ( radix : integer := 2;
 			 bits_number: integer :=4---how many number the inputs have
 			 );
 			
-PORT ( X_d : in std_logic_vector (bandwidth-1 downto 0):= "00011100";
-		 D_d : in std_logic_vector (bandwidth-1 downto 0):= "00010000";
+PORT ( X_d : in std_logic_vector (bandwidth-1 downto 0):= "00000010";
+		 D_d : in std_logic_vector (bandwidth-1 downto 0):= "00000100";
 		 Q_d : out std_logic_vector (bandwidth-1 downto 0));
 		 
 end divider;
