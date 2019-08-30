@@ -1,4 +1,3 @@
-
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 use ieee.math_real.all;
@@ -55,10 +54,12 @@ signal P_actual : integer;
 signal P_correct : integer;
 signal P_C_output : integer;
 
+
 type int_arr is array (B-1 downto 0) of integer;
 signal X_n :int_arr;
 signal Y_n :int_arr;
 signal P_n :int_arr;
+
 
 
 -- Clock period definitions
@@ -107,22 +108,28 @@ P_c_output <= integer(real(P_correct)/real(R**B));
 -- Clock process definitions, for every Xclock cycle, all posinle value of Y will be tested
 clockY_process :process
 begin
+if (X_tmp < 2**(D*B-1)) then 
 clockY <= '0';
 wait for clock_period/2;
 clockY <= '1';
 wait for clock_period/2;
+end if;
 end process;
 
 clockX_process :process
 begin
+if (X_tmp < 2**(D*B-1)) then 
 clockX <= '1';
 wait for clock_period*(2**(D*B-1))/2;
 clockX <= '0';
 wait for clock_period*(2**(D*B-1))/2;
+end if;
 end process;
 
 --X and Y increment by 1 every time
-process(clockX,clockY) is
+ProcessXY:process(clockX,clockY) is
+variable N : integer := 1;
+variable E : real := 0.0;
 begin
     if rising_edge(clockX) then
        Y_tmp <= 0;
@@ -136,14 +143,10 @@ begin
 if rising_edge(clockY) then
        Y_tmp <= Y_tmp+1;
        Y <= std_logic_vector(to_unsigned(Y_tmp, Y'length));
+	N := N+1;
    end if;
-
+E := (((real(P_correct)-real(P_actual))/real(R**B))+ E)/real(N);
 
 end process;
-
-
---result checking
-C <= '0' when (P_c_output /= P_n(B-1)) else
-     '1';
 
 END;
