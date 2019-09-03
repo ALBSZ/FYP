@@ -1,3 +1,4 @@
+
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 use ieee.math_real.all;
@@ -134,10 +135,16 @@ if rising_edge(clockY) then
        Y <= std_logic_vector(to_unsigned(Y_tmp, Y'length));
 	N := N+1;
    end if;
-if (Y_v /= 0) then
+if (Y_v /=0) then
 E := (((real(P_actual)-real(X_v))/real(Y_v))+ E*real(N-1))/real(N);
-end if;
+end if ;
 
+if (E < 1.0) and (E >-1.0)then
+	C <= '1';
+else 
+	C <= '0';
+end if;
+end process;
 
 
 END;
