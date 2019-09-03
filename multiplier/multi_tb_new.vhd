@@ -145,7 +145,13 @@ if rising_edge(clockY) then
        Y <= std_logic_vector(to_unsigned(Y_tmp, Y'length));
 	N := N+1;
    end if;
-E := (((real(P_correct)-real(P_actual))/real(R**B))+ E*real(N-1))/real(N);
+E := ((real(P_correct)-real(P_actual))/real(R**B));
+
+if (E < 1.0) and (E >-1.0)then
+	C <= '1';
+else 
+	C <= '0';
+end if;
 
 end process;
 
